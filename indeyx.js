@@ -1,9 +1,9 @@
-import tkinter as tk
-from tkinter import messagebox
+tkinter as tk
+from tkinter import messagebox, ttk
 import sqlite3
 
 # Conectar ao banco de dados (ou criar se não existir)
-conn = sqlite3.connect('clientes.db')
+conn = sqlite3.connect('clientes.dbimport ')
 cursor = conn.cursor()
 
 # Criar tabela se não existir
@@ -37,6 +37,22 @@ def salvar_cliente():
     else:
         messagebox.showwarning("Atenção", "Todos os campos devem ser preenchidos!")
 
+# Função para visualizar os dados dos clientes
+def visualizar_clientes():
+    janela_visualizacao = tk.Toplevel()
+    janela_visualizacao.title("Clientes Cadastrados")
+    
+    tree = ttk.Treeview(janela_visualizacao, columns=("ID", "Nome", "Email", "Telefone"), show="headings")
+    tree.heading("ID", text="ID")
+    tree.heading("Nome", text="Nome")
+    tree.heading("Email", text="Email")
+    tree.heading("Telefone", text="Telefone")
+    tree.pack(fill=tk.BOTH, expand=True)
+    
+    cursor.execute('SELECT * FROM clientes')
+    for row in cursor.fetchall():
+        tree.insert("", tk.END, values=row)
+
 # Configuração da interface gráfica
 root = tk.Tk()
 root.title("Cadastro de Clientes")
@@ -55,8 +71,10 @@ entry_telefone.grid(row=2, column=1, padx=10, pady=5)
 
 tk.Button(root, text="Salvar", command=salvar_cliente).grid(row=3, column=0, padx=10, pady=10)
 tk.Button(root, text="Limpar", command=limpar_formulario).grid(row=3, column=1, padx=10, pady=10)
+tk.Button(root, text="Visualizar Clientes", command=visualizar_clientes).grid(row=4, column=0, columnspan=2, pady=10)
 
 root.mainloop()
 
 # Fechar a conexão com o banco de dados ao encerrar o programa
 conn.close()
+
